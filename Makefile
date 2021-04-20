@@ -3,7 +3,7 @@ HOSTNAME=github.com
 NAMESPACE=andrewstucki
 NAME=godaddy
 BINARY=terraform-provider-${NAME}
-VERSION=2.0.0
+VERSION=2.0.1
 OS_ARCH=darwin_amd64
 
 default: install
