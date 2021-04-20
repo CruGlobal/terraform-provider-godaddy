@@ -120,7 +120,7 @@ type DomainPurchase struct {
 	RegistrantContact *Contact `json:"contactRegistrant,omitempty"`
 	TechContact       *Contact `json:"contactTech,omitempty"`
 	Domain            string   `json:"domain,omitempty"`
-	NameServers       []string `json:"nameservers,omitempty"`
+	NameServers       []string `json:"nameServers"`
 	YearsLeased       int      `json:"period,omitempty"`
 	EnablePrivacy     bool     `json:"privacy,omitempty"`
 	AutoRenew         bool     `json:"renewAuto,omitempty"`
