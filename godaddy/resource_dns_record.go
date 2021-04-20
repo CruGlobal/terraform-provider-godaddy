@@ -5,6 +5,8 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/kolikons/terraform-provider-godaddy/api"
 )
@@ -238,7 +240,7 @@ func resourceDomainRecordUpdate(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	if err = populateDomainInfo(client, r, d); err != nil {
+	if err = populateDomainInfo(client, r.Customer, r.Domain, d); err != nil {
 		return err
 	}
 
@@ -254,7 +256,7 @@ func resourceDomainRecordRestore(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	if err = populateDomainInfo(client, r, d); err != nil {
+	if err = populateDomainInfo(client, r.Customer, r.Domain, d); err != nil {
 		return err
 	}
 
@@ -262,14 +264,22 @@ func resourceDomainRecordRestore(d *schema.ResourceData, meta interface{}) error
 	return client.UpdateDomainRecords(r.Customer, r.Domain, defaultRecords)
 }
 
-func populateDomainInfo(client *api.Client, r *domainRecordResource, d *schema.ResourceData) error {
+func populateDomainInfo(client *api.Client, cust, dom string, d *schema.ResourceData) error {
 	var err error
 	var domain *api.Domain
 
-	log.Println("Fetching", r.Domain, "info...")
-	domain, err = client.GetDomain(r.Customer, r.Domain)
-	if err != nil {
-		return fmt.Errorf("couldn't find domain (%s): %s", r.Domain, err.Error())
+	for i := 0; i < 10; i++ {
+		log.Println("Fetching", dom, "info...")
+		domain, err = client.GetDomain(cust, dom)
+		if err != nil {
+			if i == 9 {
+				return fmt.Errorf("couldn't find domain (%s): %s", dom, err.Error())
+			}
+			// sleep and retry
+			time.Sleep(5 * time.Second)
+		} else {
+			break
+		}
 	}
 
 	d.SetId(strconv.FormatInt(domain.ID, 10))

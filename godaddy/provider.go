@@ -31,7 +31,8 @@ func Provider() *schema.Provider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"godaddy_domain_record": resourceDomainRecord(),
+			"godaddy_domain_record":   resourceDomainRecord(),
+			"godaddy_domain_purchase": resourceDomainPurchase(),
 		},
 
 		ConfigureFunc: providerConfigure,

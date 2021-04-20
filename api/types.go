@@ -82,11 +82,160 @@ var supportedTypes = []string{
 	AType, AAAAType, CAAType, CNameType, MXType, NSType, SOAType, SRVType, TXTType,
 }
 
+// Address is the structure used for mailing addresses
+type Address struct {
+	Line1      string `json:"address1,omitempty"`
+	Line2      string `json:"address2,omitempty"`
+	City       string `json:"city,omitempty"`
+	Country    string `json:"country,omitempty"`
+	PostalCode string `json:"postalCode,omitempty"`
+	State      string `json:"state,omitempty"`
+}
+
+// Consent is the structure containing consent info
+type Consent struct {
+	AgreedAt      string   `json:"agreedAt"`
+	AgreedBy      string   `json:"agreedBy,omitempty"`
+	AgreementKeys []string `json:"agreementKeys,omitempty"`
+}
+
+// Contact is the structure used to hold contact info
+type Contact struct {
+	Address      *Address `json:"addressMailing,omitempty"`
+	Email        string   `json:"email,omitempty"`
+	Fax          string   `json:"fax,omitempty"`
+	JobTitle     string   `json:"jobTitle,omitempty"`
+	FirstName    string   `json:"nameFirst,omitempty"`
+	LastName     string   `json:"nameLast,omitempty"`
+	MiddleName   string   `json:"nameMiddle,omitempty"`
+	Organization string   `json:"organization,omitempty"`
+	Phone        string   `json:"phone,omitempty"`
+}
+
+// DomainPurchase is the structure used for purchasing a domain
+type DomainPurchase struct {
+	Consent           *Consent `json:"consent,omitempty"`
+	AdminContact      *Contact `json:"contactAdmin,omitempty"`
+	BillingContact    *Contact `json:"contactBilling,omitempty"`
+	RegistrantContact *Contact `json:"contactRegistrant,omitempty"`
+	TechContact       *Contact `json:"contactTech,omitempty"`
+	Domain            string   `json:"domain,omitempty"`
+	NameServers       []string `json:"nameservers,omitempty"`
+	YearsLeased       int      `json:"period,omitempty"`
+	EnablePrivacy     bool     `json:"privacy,omitempty"`
+	AutoRenew         bool     `json:"renewAuto,omitempty"`
+}
+
+// DomainPurchaseReceipt is the receipt of a purchase
+type DomainPurchaseReceipt struct {
+	Currency string `json:"currency"`
+	Count    int    `json:"itemCount"`
+	OrderID  int    `json:"orderId"`
+	Total    int    `json:"total"`
+}
+
+// DomainPurchaseOpt provides support for setting optional parameters
+type DomainPurchaseOpt func(*DomainPurchase) error
+
+// NewDomainPurchase validates and constructs a DomainPurchase, if valid.
+func NewDomainPurchase(name string, opts ...DomainPurchaseOpt) (*DomainPurchase, error) {
+	name = strings.TrimSpace(name)
+	dp := &DomainPurchase{
+		Domain: name,
+	}
+	for _, opt := range opts {
+		if err := opt(dp); err != nil {
+			return nil, err
+		}
+	}
+	return dp, nil
+}
+
+// PurchaseConsent sets the purchase consent info
+func PurchaseConsent(consent Consent) DomainPurchaseOpt {
+	return func(rec *DomainPurchase) error {
+		rec.Consent = &consent
+		return nil
+	}
+}
+
+// Admin sets the purchase admin info
+func Admin(contact Contact) DomainPurchaseOpt {
+	return func(rec *DomainPurchase) error {
+		rec.AdminContact = &contact
+		return nil
+	}
+}
+
+// Billing sets the purchase billing info
+func Billing(contact Contact) DomainPurchaseOpt {
+	return func(rec *DomainPurchase) error {
+		rec.BillingContact = &contact
+		return nil
+	}
+}
+
+// Registrant sets the purchase registrant info
+func Registrant(contact Contact) DomainPurchaseOpt {
+	return func(rec *DomainPurchase) error {
+		rec.RegistrantContact = &contact
+		return nil
+	}
+}
+
+// Tech sets the purchase tech info
+func Tech(contact Contact) DomainPurchaseOpt {
+	return func(rec *DomainPurchase) error {
+		rec.TechContact = &contact
+		return nil
+	}
+}
+
+// Nameservers sets the purchase ns info
+func Nameservers(ns []string) DomainPurchaseOpt {
+	return func(rec *DomainPurchase) error {
+		rec.NameServers = ns
+		return nil
+	}
+}
+
+// YearsLeased sets the purchase period info
+func YearsLeased(years int) DomainPurchaseOpt {
+	return func(rec *DomainPurchase) error {
+		rec.YearsLeased = years
+		return nil
+	}
+}
+
+// EnablePrivacy sets the purchase privacy info
+func EnablePrivacy(privacy bool) DomainPurchaseOpt {
+	return func(rec *DomainPurchase) error {
+		rec.EnablePrivacy = privacy
+		return nil
+	}
+}
+
+// AutoRenew sets the purchase renewal info
+func AutoRenew(renew bool) DomainPurchaseOpt {
+	return func(rec *DomainPurchase) error {
+		rec.AutoRenew = renew
+		return nil
+	}
+}
+
 // Domain encapsulates a domain resource
 type Domain struct {
-	ID     int64  `json:"domainId"`
-	Name   string `json:"domain"`
-	Status string `json:"status"`
+	ID                int64    `json:"domainId"`
+	Name              string   `json:"domain"`
+	Status            string   `json:"status"`
+	AdminContact      *Contact `json:"contactAdmin,omitempty"`
+	BillingContact    *Contact `json:"contactBilling,omitempty"`
+	RegistrantContact *Contact `json:"contactRegistrant,omitempty"`
+	TechContact       *Contact `json:"contactTech,omitempty"`
+	NameServers       []string `json:"nameservers,omitempty"`
+	YearsLeased       int      `json:"period,omitempty"`
+	EnablePrivacy     bool     `json:"privacy,omitempty"`
+	AutoRenew         bool     `json:"renewAuto,omitempty"`
 }
 
 // DomainRecord encapsulates a domain record resource

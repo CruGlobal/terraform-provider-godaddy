@@ -15,9 +15,78 @@ var (
 	pathDomains             = "%s/v1/domains/%s"
 )
 
+// PurchaseDomain purchases the given domain for the user
+func (c *Client) PurchaseDomain(customerID string, purchase *DomainPurchase) (*DomainPurchaseReceipt, error) {
+	domainURL := c.constructURL(pathDomains, "purchase")
+	data, err := json.Marshal(purchase)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, domainURL, bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+
+	var d DomainPurchaseReceipt
+	if err := c.execute(customerID, req, &d); err != nil {
+		return nil, err
+	}
+
+	return &d, nil
+}
+
+// CancelDomain cancels a domain
+func (c *Client) CancelDomain(customerID, domain string) error {
+	domainURL := c.constructURL(pathDomains, domain)
+	req, err := http.NewRequest(http.MethodDelete, domainURL, nil)
+
+	if err != nil {
+		return err
+	}
+
+	return c.execute(customerID, req, nil)
+}
+
+// UpdateDomain updates a domain
+func (c *Client) UpdateDomain(customerID, domain string, purchase *DomainPurchase) error {
+	domainURL := c.constructURL(pathDomains, domain)
+	data, err := json.Marshal(purchase)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPatch, domainURL, bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+
+	if err := c.execute(customerID, req, nil); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ValidateDomainPurchase validates the domain purchase request
+func (c *Client) ValidateDomainPurchase(customerID string, purchase *DomainPurchase) error {
+	domainURL := c.constructURL(pathDomains, "")
+	data, err := json.Marshal(purchase)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, domainURL, bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+
+	return c.execute(customerID, req, nil)
+}
+
 // GetDomains fetches the details for the provided domain
 func (c *Client) GetDomains(customerID string) ([]Domain, error) {
-	domainURL := fmt.Sprintf(pathDomains, c.baseURL, "")
+	domainURL := c.constructURL(pathDomains, "")
 	req, err := http.NewRequest(http.MethodGet, domainURL, nil)
 
 	if err != nil {
@@ -34,7 +103,7 @@ func (c *Client) GetDomains(customerID string) ([]Domain, error) {
 
 // GetDomain fetches the details for the provided domain
 func (c *Client) GetDomain(customerID, domain string) (*Domain, error) {
-	domainURL := fmt.Sprintf(pathDomains, c.baseURL, domain)
+	domainURL := c.constructURL(pathDomains, domain)
 	req, err := http.NewRequest(http.MethodGet, domainURL, nil)
 
 	if err != nil {
@@ -51,7 +120,7 @@ func (c *Client) GetDomain(customerID, domain string) (*Domain, error) {
 
 // GetDomainRecords fetches all of the existing records for the provided domain
 func (c *Client) GetDomainRecords(customerID, domain string) ([]*DomainRecord, error) {
-	domainURL := fmt.Sprintf(pathDomainRecords, c.baseURL, domain)
+	domainURL := c.constructURL(pathDomainRecords, domain)
 	req, err := http.NewRequest(http.MethodGet, domainURL, nil)
 
 	if err != nil {
@@ -80,7 +149,7 @@ func (c *Client) UpdateDomainRecords(customerID, domain string, records []*Domai
 		}
 
 		buffer := bytes.NewBuffer(msg)
-		domainURL := fmt.Sprintf(pathDomainRecordsByType, c.baseURL, domain, t)
+		domainURL := c.constructURL(pathDomainRecordsByType, domain, t)
 		log.Println(domainURL)
 		log.Println(buffer)
 
@@ -107,4 +176,9 @@ func (c *Client) domainRecordsOfType(t string, records []*DomainRecord) []*Domai
 	}
 
 	return typeRecords
+}
+
+func (c *Client) constructURL(path string, v ...interface{}) string {
+	v = append([]interface{}{c.baseURL}, v...)
+	return strings.TrimSuffix(fmt.Sprintf(path, v...), "/")
 }
