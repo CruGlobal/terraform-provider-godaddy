@@ -4,9 +4,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 
-
-
-	"github.com/kolikons/terraform-provider-godaddy/godaddy"
+	"github.com/andrewstucki/terraform-provider-godaddy/godaddy"
 )
 
 const (

@@ -1,11 +1,12 @@
 # terraform-godaddy
+
 [Terraform](https://www.terraform.io/) plugin for managing domain records
 
 [ ![Codeship Status for n3integration/terraform-godaddy](https://app.codeship.com/projects/29e8c490-8b5d-0134-914d-3e63d62140d1/status?branch=master)](https://app.codeship.com/projects/184616)
 
 <dl>
   <dt>Terraform v0.13.x</dt>
-  <dd>https://github.com/kolikons/terraform-provider-godaddy/releases/tag/v1.8.1</dd>
+  <dd>https://github.com/andrewstucki/terraform-provider-godaddy/releases/tag/v1.8.1</dd>
   <dt>Terraform v0.12.x</dt>
   <dd>https://github.com/n3integration/terraform-godaddy/releases/tag/v1.7.3</dd>
   <dt>Terraform v0.11.x</dt>
@@ -27,12 +28,14 @@ bash <(curl -s https://raw.githubusercontent.com/n3integration/terraform-godaddy
 ```
 
 ### Installation steps for Terraform Cloud
+
 1. Download latest release for `linux_amd64` from https://github.com/n3integration/terraform-godaddy/releases
 2. Unpack to `<Project Folder>/terraform.d/plugins/linux_amd64`.
 3. Rename to match naming scheme: `terraform-provider-<NAME>_vX.Y.Z` https://www.terraform.io/docs/configuration/providers.html#third-party-plugins
 4. Run `terraform init` to make sure the provider works.
 
 ## API Key
+
 In order to leverage the GoDaddy APIs, an [API key](https://developer.godaddy.com/keys/) is required. The key pair can be optionally stored in environment variables.
 
 ```bash
@@ -52,20 +55,21 @@ provider "godaddy" {
 ```
 
 ## Domain Record Resource
+
 A `godaddy_domain_record` resource requires a `domain`. If the domain is not registered under the account that owns the key, an optional `customer` number can be specified.
 Additionally, one or more `record` instances are required. For each `record`, the `name`, `type`, and `data` attributes are required. `MX` records can optionally specify `priority` or will default to `0`. Address and NameServer records can be
 defined using shorthand-notation as `addresses = [""]` or `nameservers = [""]`, respectively unless you need to override the default time-to-live (3600). The available record
 types include:
 
-* A
-* AAAA
-* CAA
-* CNAME
-* MX
-* NS
-* SOA
-* SRV
-* TXT
+- A
+- AAAA
+- CAA
+- CNAME
+- MX
+- NS
+- SOA
+- SRV
+- TXT
 
 ```terraform
 resource "godaddy_domain_record" "gd-fancy-domain" {
@@ -118,6 +122,7 @@ make linux
 ```
 
 ### Additional Information
+
 If your zone contains existing data, please ensure that your Terraform resource configuration includes all existing records, otherwise they will be removed.
 
 This plugin also supports Terraform's [import](https://www.terraform.io/docs/import/usage.html) feature. This will at least allow you to determine the changes introduced

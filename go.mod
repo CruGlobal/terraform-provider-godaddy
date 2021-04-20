@@ -1,4 +1,4 @@
-module github.com/kolikons/terraform-provider-godaddy
+module github.com/andrewstucki/terraform-provider-godaddy
 
 go 1.15
 

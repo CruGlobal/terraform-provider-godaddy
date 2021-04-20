@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/kolikons/terraform-provider-godaddy/api"
+	"github.com/andrewstucki/terraform-provider-godaddy/api"
 )
 
 const (
