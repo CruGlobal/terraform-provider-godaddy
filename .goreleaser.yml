@@ -15,15 +15,19 @@ builds:
     - -trimpath
   ldflags:
     - '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}'
-  goos:
-    - linux
-    - darwin
   goarch:
-    - amd64
     - '386'
+    - amd64
+    - arm
+    - arm64
+  goos:
+    - darwin
+    - freebsd
+    - linux
+    - windows
   ignore:
-    - goos: darwin
-      goarch: '386'
+    - goarch: '386'
+      goos: darwin
   binary: '{{ .ProjectName }}_v{{ .Version }}'
 archives:
 - format: zip

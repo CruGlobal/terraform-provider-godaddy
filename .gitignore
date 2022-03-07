@@ -1,7 +1,8 @@
 .DS_Store
-terraform-provider-hashicups
+.idea/
+terraform-provider-redisdb
 bin
-.vendor
+
 # Local .terraform directories
 **/.terraform/*
 
