@@ -1,21 +1,32 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
+	"context"
+	"flag"
+	"log"
 
-	"github.com/andrewstucki/terraform-provider-godaddy/godaddy"
+	"github.com/CruGlobal/terraform-provider-godaddy/internal/provider"
+	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 
-const (
-	// BaseURL points to the GoDaddy API's base
-	BaseURL = "https://api.godaddy.com/v1"
-)
+//go:generate terraform fmt -recursive ./examples/
+//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name godaddy
+
+// version is set by goreleaser at build time via -ldflags.
+var version = "dev"
 
 func main() {
-	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: func() *schema.Provider {
-			return godaddy.Provider()
-		},
-	})
+	var debug bool
+
+	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
+	flag.Parse()
+
+	opts := providerserver.ServeOpts{
+		Address: "registry.terraform.io/CruGlobal/godaddy",
+		Debug:   debug,
+	}
+
+	if err := providerserver.Serve(context.Background(), provider.New(version), opts); err != nil {
+		log.Fatal(err.Error())
+	}
 }

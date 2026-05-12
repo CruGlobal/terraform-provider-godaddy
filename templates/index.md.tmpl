@@ -1,0 +1,23 @@
+---
+page_title: "godaddy Provider"
+description: |-
+{{ .Description | plainmarkdown | trimspace | prefixlines "  " }}
+---
+
+# godaddy Provider
+
+The `godaddy` provider lets you manage DNS records, nameservers, and domain
+registrations on your GoDaddy account.
+
+## Example Usage
+
+{{ tffile "examples/provider/provider.tf" }}
+
+## Authentication
+
+Either set `key` and `secret` directly on the provider, or supply them via the
+`GODADDY_API_KEY` and `GODADDY_API_SECRET` environment variables. The base URL
+defaults to `https://api.godaddy.com` and can be overridden for the OTE sandbox
+via `baseurl` (or `GODADDY_API_URL`).
+
+{{ .SchemaMarkdown | trimspace }}

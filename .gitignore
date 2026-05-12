@@ -1,7 +1,8 @@
 .DS_Store
 .idea/
-terraform-provider-redisdb
+terraform-provider-godaddy
 bin
+dist/
 
 # Local .terraform directories
 **/.terraform/*
